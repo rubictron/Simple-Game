@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<!-- Rubictron -->
+<!-- p.asithasandakelum@gmail.com -->
+<html>
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta charset="utf-8"/>
+
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+    <script src="js/semantic.min.js"></script>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/jquery-ui.min.css">
+    <link rel="stylesheet" href="css/semantic.min.css">
+
+    <!-- <link rel="stylesheet" href="css/styles.css"> -->
+    <!-- <script src="js/script.js"></script> -->
+    <title>rubictron</title>
+
+
+</head>
+<body>
+
+<div id="main" class=" row container-fluid">
+
+
+    <div class="col-md-1">
+        <audio src="sound/jump.mp3" class="sound" preload="none" id="soundjump">
+
+    </div>
+    <div id="gameArea" class="col-md-10">
+        <img id="bicycle" src="images/bicycle.gif">
+        <div id="road" class="road"></div>
+        <div id="rock" class="rock"></div>
+        <div id="rock2" class="rock"></div>
+        <div id="rock3" class="rock"></div>
+        <div id="rock4" class="rock"></div>
+        <div id="road2" class="road"></div>
+        
+
+    </div>
+
+    <div id="scorebord" class="col-md-1">
+        <div class="alert alert-success"> score</div>
+        <div id="score" class="alert alert-success">00</div>
+
+    </div>
+
+
+</div>
+
+<style>
+
+
+    #bicycle {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        left: 200px;
+    }
+
+    .road {
+        height: 150px;
+        background-color: rgba(194, 86, 60, 0.76);
+        position: absolute;
+        margin: 0;
+
+    }
+
+    #road {
+        width: 100%;
+        bottom: 0px;
+        left: 0;
+
+    }
+
+    #road2 {
+        width: 1500px;
+        bottom: 300px;
+        height: 30px;
+        left: 100%;
+    }
+
+    .rock {
+        position: absolute;
+        margin: 0;
+        left: 100%;
+    }
+
+    #rock {
+        width: 100px;
+        height: 50px;
+        background-image: url("images/cat.gif");
+        background-size: cover;
+
+
+    }
+
+    #rock2 {
+        width: 100px;
+        height: 80px;
+        background-image: url("images/rock2.png");
+        background-size: cover;
+
+    }
+
+    #rock3 {
+        width: 100px;
+        height: 50px;
+        background-image: url("images/rock1.gif");
+        background-size: cover;
+
+    }
+
+    body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    #main {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+
+        background-image: url("images/flag.png");
+        /*background-size: cover;*/
+        /*background-repeat: no-repeat;*/
+
+
+    }
+
+    #gameArea {
+
+        background-image: url("images/giphy2.gif");
+        background-size: cover;
+        background-repeat: no-repeat;
+        overflow: hidden;
+    }
+
+    #scorebord{
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .alert{
+        border: 3px solid rgba(8,16,255,0.76);
+
+    }
+
+    @media all and (max-width: 768px){
+
+        .col-md-1{
+         display: none;
+        }
+
+    }
+
+
+</style>
+
+<script>
+
+    var a = parseInt($('#road').css('bottom')) + parseInt($('#road').css('height'));
+    var baseY = a;
+    var bicycle = $('#bicycle');
+    var speed;
+    var score=0;
+    $('.rock').css({"bottom": baseY});
+
+    $('#bicycle').animate({bottom: baseY});
+    
+    
+    setInterval(function () {
+        
+        $('#score').html(score+=8);
+
+    },800)
+
+    function upRoad() {
+
+        var tm= setInterval(function () {
+            if (parseInt(bicycle.css('left')) <= parseInt($('#road2').css('left')) + parseInt($('#road2').css('width'))
+            && parseInt(bicycle.css('left')) + parseInt(bicycle.css('width')) > parseInt($('#road2').css('left'))){
+                baseY = 330;
+                bicycle.stopAll();
+                bicycle.css({"bottom": baseY});
+            }else {
+                baseY=a;
+                clearTimeout(tm);
+                bicycle.css({"bottom": baseY});
+            }
+        },1)
+
+
+    }
+
+    var clicked = false;
+    $('body').keydown(function (e) {
+        if (e.keyCode==32) {
+
+        console.log(parseInt(bicycle.css('bottom')) + "+++" + baseY);
+
+        var time = 500;
+        var h = 200;
+        if (parseInt(bicycle.css('bottom')) == baseY || parseInt(bicycle.css('bottom')) < baseY + 10) {
+            clicked = true;
+            bicycle.animate({bottom: baseY + h}, {duration: time});
+            $('#soundjump').trigger('play');
+            setTimeout(function () {
+                bicycle.animate({bottom: baseY}, {duration: time});
+                setTimeout(function () {
+                    clicked = false;
+                }, time);
+            }, time + 100);
+        } else if (clicked && parseInt(bicycle.css('bottom')) > baseY + 80) {
+            clicked = false;
+            bicycle.animate({bottom: baseY + h + h}, {duration: time});
+            setTimeout(function () {
+                bicycle.animate({bottom: baseY}, {duration: time * 2});
+            }, time)
+        }
+    }
+
+    });
+
+    function sendObject(time, object, func) {
+        console.log('send');
+        object.removeProp("left");
+        object.css({"left": "100%"});
+        object.animate({left: -parseInt(object.css('width'))}, {duration: time});
+        var timer = setInterval(    function (object, func) {
+            if (parseInt(bicycle.css('left')) + parseInt(bicycle.css('width')) > parseInt(object.css('left'))
+                && parseInt(bicycle.css('left')) < parseInt(object.css('left')) + parseInt(object.css('width'))
+                && parseInt(bicycle.css('bottom')) <= parseInt(object.css('bottom')) + parseInt(object.css('height'))
+                && parseInt(bicycle.css('bottom')) + parseInt(bicycle.css('height')) > parseInt(object.css('bottom'))) {
+                func();
+                clearTimeout(timer);
+
+            }
+
+        }, 1, object, func);
+
+    }
+
+
+
+
+
+    function gameOver() {
+        alert("game over");
+        location.reload();
+    }
+
+
+
+
+    speed = 3500;
+    setInterval(function () {
+        sendObject(3000, $('#rock'), gameOver);
+    }, speed);
+
+    speed = 9000;
+    setInterval(function () {
+        sendObject(3000, $('#rock2'), gameOver);
+    }, speed);
+
+    speed = 6000;
+    setInterval(function () {
+        sendObject(3000, $('#rock3'), gameOver);
+    }, speed);
+
+    speed = 40000;
+    setInterval(function () {
+        baseY=a;
+        sendObject(10000, $('#road2'), upRoad);
+    }, speed);
+
+
+</script>
+
+<script src="js/jquery-ui.min.js"></script>
+<script src="js/semantic.min.js"></script>
+
+</body>
+</html>
